@@ -1,6 +1,7 @@
 from collections import defaultdict
-from itertools import combinations, product
-from functools import reduce
+from functools import lru_cache, reduce
+from itertools import permutations
+from string import ascii_letters
 
 
 def find_primes(minterms: set[str]) -> set[str]:
@@ -32,3 +33,47 @@ def find_primes(minterms: set[str]) -> set[str]:
         if not new_implicants:
             return primes
         groups = new_implicants
+
+
+def get_min_primes(minterms: set[str], primes: set[str]) -> set[str]:
+    @lru_cache(maxsize=len(minterms) * len(primes))
+    def covers(prime: str, minterm: str) -> bool:
+        return all(p == '-' or p == m for p, m in zip(prime, minterm))
+
+    def distribute(a: set[str], b: set[str]) -> set[str]:
+        result = set()
+        for x in a:
+            for y in b:
+                result.add(''.join(sorted(set(x + y))))
+        return result
+
+    def absorption(sop: set[str]) -> set[str]:
+        sop = sop.copy()
+        while True:
+            for a, b in permutations(sop, 2):
+                if all(c in b for c in a):
+                    sop.discard(b)
+                    break
+            else:
+                return sop
+
+    essential = set()
+    for minterm in minterms:
+        filtered = [p for p in primes if covers(p, minterm)]
+        if len(filtered) == 1:
+            essential.add(filtered[0])
+    minterms = (minterms
+                - {m for p in essential for m in minterms if covers(p, m)})
+    if not minterms:
+        return essential
+
+    primes = primes - essential
+    if len(primes) > len(ascii_letters):
+        print("Too many prime implicants left.")
+        return primes | essential
+
+    prime_dict = {p: letter for p, letter in zip(primes, ascii_letters)}
+    pos = [{prime_dict[p] for p in primes if covers(p, m)} for m in minterms]
+    sop = absorption(reduce(distribute, pos))
+    smallest = min(sop, key=len)
+    return essential | {k for k, v in prime_dict.items() if v in smallest}
