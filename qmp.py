@@ -3,7 +3,7 @@ from itertools import combinations, product
 from functools import reduce
 
 
-def find_prime_implicants(minterms: set[str]) -> set[str]:
+def find_primes(minterms: set[str]) -> set[str]:
     def group_implicants() -> dict[int, set[str]]:
         groups = defaultdict(set)
         for minterm in minterms:
@@ -22,11 +22,12 @@ def find_prime_implicants(minterms: set[str]) -> set[str]:
         new_implicants = defaultdict(set)
         non_primes = set()
         for i in range(max(groups.keys())):
-            for a, b in product(groups[i], groups[i+1]):
-                if not differ_by_one(a, b):
-                    continue
-                new_implicants[i].add(merge_implicants(a, b))
-                non_primes |= {a, b}
+            for a in groups[i]:
+                for b in groups[i+1]:
+                    if not differ_by_one(a, b):
+                        continue
+                    new_implicants[i].add(merge_implicants(a, b))
+                    non_primes |= {a, b}
         primes = primes.union(*groups.values()) - non_primes
         if not new_implicants:
             return primes
