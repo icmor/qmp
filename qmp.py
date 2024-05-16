@@ -35,7 +35,8 @@ def find_primes(minterms: set[str]) -> set[str]:
         groups = new_implicants
 
 
-def get_min_primes(minterms: set[str], primes: set[str]) -> set[str]:
+def get_min_primes(minterms: set[str], primes: set[str],
+                   dc: set[str] | None = None) -> set[str]:
     @lru_cache(maxsize=len(minterms) * len(primes))
     def covers(prime: str, minterm: str) -> bool:
         return all(p == '-' or p == m for p, m in zip(prime, minterm))
@@ -57,6 +58,9 @@ def get_min_primes(minterms: set[str], primes: set[str]) -> set[str]:
             else:
                 return sop
 
+    if dc:
+        primes = primes - {p for p in primes
+                           if all(m in dc for m in minterms if covers(p, m))}
     essential = set()
     for minterm in minterms:
         filtered = [p for p in primes if covers(p, minterm)]

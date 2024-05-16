@@ -34,9 +34,16 @@ def expand_primes(primes: set[str]) -> list[set[str]]:
 
 parser = argparse.ArgumentParser()
 parser.add_argument("minterms", metavar="MINTERMS", nargs="+", type=int)
+parser.add_argument("--dont-cares", "-dc", metavar="DC", nargs="+", type=int)
 args = parser.parse_args()
 
 minterms = minterms_to_bin(args.minterms)
-primes = get_min_primes(minterms, find_primes(minterms))
+if args.dont_cares:
+    primes = find_primes(minterms | minterms_to_bin(args.dont_cares))
+    primes = get_min_primes(minterms, primes, args.dont_cares)
+else:
+    primes = find_primes(minterms)
+    primes = get_min_primes(minterms, primes)
+
 result = primes_to_minterms(expand_primes(primes))
 print(result)
