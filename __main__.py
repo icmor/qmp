@@ -7,8 +7,8 @@ def minterms_to_bin(minterms: set[int]) -> set[str]:
     return {f"{m:0{maxlen}b}" for m in minterms}
 
 
-def primes_to_minterms(primes: list[set[str]]) -> list[set[int]]:
-    return [{int(m, 2) for m in prime} for prime in primes]
+def primes_to_minterms(primes: list[set[str]]) -> set[tuple[int, ...]]:
+    return {tuple(sorted(int(m, 2) for m in prime)) for prime in primes}
 
 
 def expand_primes(primes: set[str]) -> list[set[str]]:
