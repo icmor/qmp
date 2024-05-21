@@ -1,5 +1,10 @@
-from .qmp import find_primes, get_min_primes
+#!/usr/bin/env python
 import argparse
+
+if __package__ is None:
+    from qmp import find_primes, get_min_primes		# type:ignore
+else:
+    from .qmp import find_primes, get_min_primes
 
 
 def minterms_to_bin(minterms: set[int]) -> set[str]:
@@ -39,7 +44,9 @@ def expand_primes(primes: set[str]) -> list[set[str]]:
     return result
 
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(
+    prog="qmp", description="Quine-McCluskey-Petrick minimization algorithm."
+)
 parser.add_argument("minterms", metavar="MINTERMS", nargs="+", type=int)
 parser.add_argument("--dont-cares", "-dc", metavar="DC", nargs="+", type=int)
 args = parser.parse_args()

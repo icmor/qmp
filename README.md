@@ -4,9 +4,9 @@ This is an implementation of the Quine-McCluskey algorithm focused on simplicity
 One may easily turn this more performant by actually creating a prime implicant table (instead of a function cache) and by using other techniques in conjunction with Petrick's method (like row/column domination).
 
 ## Requirements
-Python 3.9 or greater is required. The program is meant to be run as a module so just clone the repo and from the same directory run:
+Python 3.9 or greater is required. The program can be run directly from \_\_main\_\_.py but is meant to be run as a package. Just clone the repo and from the same directory run:
 ```bash
-$ python -m quine-mccluskey -h
+$ python -m qmp -h
 
 usage: __main__.py [-h] [--dont-cares DC [DC ...]] MINTERMS [MINTERMS ...]
 
